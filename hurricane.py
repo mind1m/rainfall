@@ -49,6 +49,7 @@ class HTTPResponse(object):
 
 class HTTPHandler(object):
 
+    @asyncio.coroutine
     def handler(self, request):
         raise NotImplementedError()
 
@@ -59,12 +60,17 @@ class HTTPHandler(object):
             result = template.render(kwargs)
         return result or text
 
+    @asyncio.coroutine
     def __call__(self, request):
         response = HTTPResponse(code=200)
-        body = self.handler(request)
+        if getattr(self.handler, '_is_coroutine', False):
+            body = yield from self.handler(request)
+        else:
+            body = self.handler(request)
         if body:
             response.body = body
         return response
+
 
 
 class HTTPServer(asyncio.Protocol):
@@ -87,19 +93,22 @@ class HTTPServer(asyncio.Protocol):
     def data_received(self, data):
         decoded_data = data.decode()
         request = HTTPRequest(decoded_data)
+        task = asyncio.Task(self._call_handler(request))
+        task.add_done_callback(self._finalize_request)
 
-        response = None
-        # TODO: regex here
-        if request.path in self._handlers:
-            response = self._handlers[request.path](request)
-        else:
-            response = HTTPResponse(code=404)
-        
-        self.transport.write(response.compose().encode())
-
+    def _finalize_request(self, *args, **kwargs):
         self.transport.close()
         self.h_timeout.cancel()
 
+    @asyncio.coroutine
+    def _call_handler(self, request):
+        response = None
+        # TODO: regex here
+        if request.path in self._handlers:
+            response = yield from self._handlers[request.path](request)
+        else:
+            response = HTTPResponse(code=404)
+        self.transport.write(response.compose().encode())
         print(datetime.datetime.now(), request.method, request.path, response.code)
 
     def connection_lost(self, exc):
@@ -146,5 +155,5 @@ class Application(object):
         print(
             TerminalColors.OKGREEN, '\nStarting Hurricane...\n', 
             # TerminalColors.OKBLUE,  '\nBrace yourself\n\n',
-            TerminalColors.ENDC, '\nServing on ', sock_name,
+            TerminalColors.ENDC, '\nServing on', sock_name,
         )
