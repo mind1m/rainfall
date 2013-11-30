@@ -1,13 +1,15 @@
-from hurricane import Application, HTTPHandler
 import asyncio
+
+from hurricane import Application, HTTPHandler
+
 
 class HelloHandler(HTTPHandler):
     @asyncio.coroutine
-    def handler(self, request):
+    def handle(self, request):
         return self.render("Hello World!!")
 
 
-test = Application({
+app = Application({
     '/': HelloHandler(),
 })
-test.run()
+app.run()

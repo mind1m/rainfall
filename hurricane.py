@@ -50,7 +50,7 @@ class HTTPResponse(object):
 class HTTPHandler(object):
 
     @asyncio.coroutine
-    def handler(self, request):
+    def handle(self, request):
         raise NotImplementedError()
 
     def render(self, text, **kwargs):
@@ -63,10 +63,10 @@ class HTTPHandler(object):
     @asyncio.coroutine
     def __call__(self, request):
         response = HTTPResponse(code=200)
-        if getattr(self.handler, '_is_coroutine', False):
-            body = yield from self.handler(request)
+        if getattr(self.handle, '_is_coroutine', False):
+            body = yield from self.handle(request)
         else:
-            body = self.handler(request)
+            body = self.handle(request)
         if body:
             response.body = body
         return response
