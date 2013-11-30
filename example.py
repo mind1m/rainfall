@@ -2,7 +2,7 @@ from hurricane import Application, HTTPHandler
 import asyncio
 
 class HelloHandler(HTTPHandler):
-    # @asyncio.coroutine
+    @asyncio.coroutine
     def handler(self, request):
         return self.render("Hello World!!")
 
