@@ -116,20 +116,14 @@ class HTTPServer(asyncio.Protocol):
 
 
 class TerminalColors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
+    LIGHTBLUE = '\033[96m'
+    PURPLE = '\033[95m'
+    DARKBLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    NORMAL = '\033[0m'
+    WHITE = NORMAL + '\033[1m'
 
 
 class Application(object):
@@ -153,7 +147,33 @@ class Application(object):
 
     def greet(self, sock_name):
         print(
-            TerminalColors.OKGREEN, '\nStarting Hurricane...\n', 
+            TerminalColors.GREEN, '\nHurricane is starting...',TerminalColors.WHITE,'\n', 
+       #      """
+       #          (~~~~~\\
+       #    _(~~~~       \\
+       #  (              ~~~~\\
+       # (                    ~~\_
+       #  ~~~~~~~~~~~~~~~~~~~~~~~~
+       #  \  \  \  \  \  \  \  \\
+       #   \  \  \  \  \  \  \  \\
+       #    \  \  \  \  \  \  \  \\
+       #     `  `  `  `  `  `  `  `
+       #      `  `  `  `  `  `  `  `
+       #       `  `  `  `  `  `  `  `
+       #      """,
+            """
+        ( ~~~~)
+       (~      ~~~)
+      (~          ~~)
+      (             )
+        ~~~~~~~~~~~
+        """, TerminalColors.LIGHTBLUE,
+        """
+         \ \ \ \ \ \ 
+          \ \ \ \ \ \ 
+           ` ` ` ` ` `
+
+            """,
             # TerminalColors.OKBLUE,  '\nBrace yourself\n\n',
-            TerminalColors.ENDC, '\nServing on', sock_name,
+            TerminalColors.NORMAL, '\nServing on', sock_name, ':'
         )
