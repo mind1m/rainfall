@@ -90,7 +90,6 @@ class HTTPServer(asyncio.Protocol):
         else:
             response = HTTPResponse(code=404)
         
-        print(response.compose())
         self.transport.write(response.compose().encode())
 
         self.transport.close()
@@ -102,10 +101,21 @@ class HTTPServer(asyncio.Protocol):
         self.h_timeout.cancel()
 
 
-def start_server(loop, host, port):
-    f = loop.create_server(HttpServer, host, port)
-    s = loop.run_until_complete(f)
-    print('serving on', s.sockets[0].getsockname())
+class TerminalColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
 
 
 class Application(object):
@@ -123,6 +133,13 @@ class Application(object):
         loop.run_forever()
 
     def _start_server(self, loop, host, port):
-        f = loop.create_server(HttpServer, host, port)
+        f = loop.create_server(HTTPServer, host, port)
         s = loop.run_until_complete(f)
-        print('serving on', s.sockets[0].getsockname())
+        self.greet(s.sockets[0].getsockname())
+
+    def greet(self, sock_name):
+        print(
+            TerminalColors.OKGREEN, '\nStarting Hurricane...\n', 
+            # TerminalColors.OKBLUE,  '\nBrace yourself\n\n',
+            TerminalColors.ENDC, '\nServing on ', sock_name,
+        )
