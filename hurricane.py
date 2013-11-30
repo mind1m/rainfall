@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import asyncio
 import signal
+import jinja2
 import datetime
 from email.utils import formatdate
 
@@ -51,8 +52,12 @@ class HTTPHandler(object):
     def handler(self, request):
         raise NotImplementedError()
 
-    def render(self, text):
-        return text
+    def render(self, text, **kwargs):
+        result = ''
+        if kwargs:
+            template = jinja2.Template(text)
+            result = template.render(kwargs)
+        return result or text
 
     def __call__(self, request):
         response = HTTPResponse(code=200)
