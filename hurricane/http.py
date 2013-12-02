@@ -1,6 +1,8 @@
 from email.utils import formatdate
 from http import client
 
+from .utils import HurricaneException
+
 class HTTPRequest(object):
 
     def __init__(self, raw):
@@ -40,3 +42,9 @@ class HTTPResponse(object):
         for head, value in self.headers.items():
             header += '{}: {}\r\n'.format(head, value)
         return '{}\r\n{}'.format(header, self.body)
+
+
+class HTTPError(HurricaneException):
+    def __init__(self, code=client.INTERNAL_SERVER_ERROR, *args, **kwargs):
+        self.code = code
+        super().__init__(*args, **kwargs)

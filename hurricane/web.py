@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 import re
+import sys
 import asyncio
 import signal
 import datetime
+import traceback
 
 from http import client
 from jinja2 import Environment, FileSystemLoader
 
-from .utils import TerminalColors
-from .http import HTTPResponse, HTTPRequest
+from .utils import TerminalColors, HurricaneException
+from .http import HTTPResponse, HTTPRequest, HTTPError
 
 
 class HTTPHandler(object):
@@ -22,8 +24,7 @@ class HTTPHandler(object):
         """
         May be coroutine or a regular function.
 
-        :return text or response either explicitly
-         or via self.render() which uses jinja2 rendering.
+        :return str (may be rendered with self.render()) or HTTPError
         """
         raise NotImplementedError
 
@@ -36,16 +37,25 @@ class HTTPHandler(object):
     def __call__(self, request, **kwargs):
         """
         Is called by HTTPServer.
+
+        :return (code, body)
         """
-        response = HTTPResponse()
+        code = 200
+        body = ''
         # this check is taken form asyncio sources
         if getattr(self.handle, '_is_coroutine', False):
-            body = yield from self.handle(request, **kwargs)
+            handler_result = yield from self.handle(request, **kwargs)
         else:
-            body = self.handle(request)
-        if body:
-            response.body = body
-        return response
+            handler_result = self.handle(request)
+
+        if handler_result:
+            if isinstance(handler_result, HTTPError):
+                code = handler_result.code
+            elif isinstance(handler_result, str):
+                body = handler_result
+            else:
+                raise HurricaneException("handle() result must be HTTPError or unicode, found {}".format(type(handler_result)))
+        return (code, body)
 
 
 class HTTPServer(asyncio.Protocol):
@@ -86,16 +96,33 @@ class HTTPServer(asyncio.Protocol):
     def _call_handler(self, request):
         response = None
         path = request.path
+        exc = None
 
+        response = HTTPResponse()
         for pattern, handler in self._handlers.items():
             result = re.match(pattern, request.path)
             if result:
-                response = yield from handler(request, **result.groupdict())
-                break
+                try:
+                    code, body = yield from handler(request, **result.groupdict())
+                    response.code = code
+                    response.body = body
+                except Exception as e:
+                    # import ipdb; ipdb.set_trace()
+                    response.code = client.INTERNAL_SERVER_ERROR
+                    exc = sys.exc_info()
+                finally:
+                    break
         else:
-            response = HTTPResponse(code=client.NOT_FOUND)
+            response.code=client.NOT_FOUND
+
+        if response.code != 200:
+            response.body = "<h1>{} {}</h1>".format(response.code, client.responses[response.code])
+
         self.transport.write(response.compose().encode())
         print(datetime.datetime.now(), request.method, request.path, response.code)
+
+        if exc:
+            traceback.print_exception(*exc)
 
     def connection_lost(self, exc):
         self.h_timeout.cancel()

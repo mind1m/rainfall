@@ -2,6 +2,7 @@ import os
 import asyncio
 
 from hurricane.web import Application, HTTPHandler
+from hurricane.http import HTTPError
 
 
 class HelloHandler(HTTPHandler):
@@ -14,6 +15,10 @@ class BenchHandler(HTTPHandler):
     @asyncio.coroutine
     def handle(self, request):
         return 'Hello!'
+
+class ExceptionHandler(HTTPHandler):
+    def handle(self, request):
+        return HTTPError(403)
 
 
 class IncNumberHandler(HTTPHandler):
@@ -29,6 +34,7 @@ settings = {
 app = Application(
     {
         r'^/$': HelloHandler(),
+        r'^/exc$': ExceptionHandler(),
         r'^/bench$': BenchHandler(),
         r'^/inc/(?P<number>\d+)$': IncNumberHandler(),
     },

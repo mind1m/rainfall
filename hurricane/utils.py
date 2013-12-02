@@ -9,3 +9,7 @@ class TerminalColors:
     RED = '\033[91m'
     NORMAL = '\033[0m'
     WHITE = NORMAL + '\033[1m'
+
+
+class HurricaneException(Exception):
+    pass
