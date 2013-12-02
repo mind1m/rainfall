@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import asyncio
 import signal
 import jinja2
@@ -15,7 +16,7 @@ class HTTPHandler(object):
     All handling is in handle method.
     """
     @asyncio.coroutine
-    def handle(self, request):
+    def handle(self, request, **kwargs):
         """
         May be coroutine or a regular function.
 
@@ -32,14 +33,14 @@ class HTTPHandler(object):
         return result or text
 
     @asyncio.coroutine
-    def __call__(self, request):
+    def __call__(self, request, **kwargs):
         """
         Is called by HTTPServer.
         """
         response = HTTPResponse(code=200)
         # this check is taken form asyncio sources
         if getattr(self.handle, '_is_coroutine', False):
-            body = yield from self.handle(request)
+            body = yield from self.handle(request, **kwargs)
         else:
             body = self.handle(request)
         if body:
@@ -82,9 +83,13 @@ class HTTPServer(asyncio.Protocol):
     @asyncio.coroutine
     def _call_handler(self, request):
         response = None
-        # TODO: regex here
-        if request.path in self._handlers:
-            response = yield from self._handlers[request.path](request)
+        path = request.path
+
+        for pattern, handler in self._handlers.items():
+            result = re.match(pattern, request.path)
+            if result:
+                response = yield from handler(request, **result.groupdict())
+                break
         else:
             response = HTTPResponse(code=404)
         self.transport.write(response.compose().encode())
