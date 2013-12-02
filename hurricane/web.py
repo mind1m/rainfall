@@ -104,8 +104,8 @@ class Application(object):
       ( ~~~~~~~~~~~)
         """, TerminalColors.LIGHTBLUE,
         """
-         \ \ \ \ \ \
-          \ \ \ \ \ \
+         \ \ \ \ \ \\
+          \ \ \ \ \ \\
            ` ` ` ` ` `
 
             """,
