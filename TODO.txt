@@ -2,6 +2,6 @@
 - exception handling
 - correct HTTP response codes
 - tests
-- template loading and passing to jinja
+- ~~emplate loading and passing to jinja~~
 - static files
 - POST processing

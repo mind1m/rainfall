@@ -2,8 +2,10 @@
 import re
 import asyncio
 import signal
-from jinja2 import Environment, FileSystemLoader
 import datetime
+
+from http import client
+from jinja2 import Environment, FileSystemLoader
 
 from .utils import TerminalColors
 from .http import HTTPResponse, HTTPRequest
@@ -35,7 +37,7 @@ class HTTPHandler(object):
         """
         Is called by HTTPServer.
         """
-        response = HTTPResponse(code=200)
+        response = HTTPResponse()
         # this check is taken form asyncio sources
         if getattr(self.handle, '_is_coroutine', False):
             body = yield from self.handle(request, **kwargs)
@@ -91,7 +93,7 @@ class HTTPServer(asyncio.Protocol):
                 response = yield from handler(request, **result.groupdict())
                 break
         else:
-            response = HTTPResponse(code=404)
+            response = HTTPResponse(code=client.NOT_FOUND)
         self.transport.write(response.compose().encode())
         print(datetime.datetime.now(), request.method, request.path, response.code)
 

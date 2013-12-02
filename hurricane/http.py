@@ -1,5 +1,5 @@
 from email.utils import formatdate
-
+from http import client
 
 class HTTPRequest(object):
 
@@ -25,7 +25,7 @@ class HTTPRequest(object):
 
 class HTTPResponse(object):
 
-    def __init__(self, body='', code=200, additional_headers={}):
+    def __init__(self, body='', code=client.OK, additional_headers={}):
         self.body = body
         self.code = code
         self.headers = {
@@ -36,7 +36,7 @@ class HTTPResponse(object):
         self.headers.update(additional_headers)
 
     def compose(self):
-        header = 'HTTP/1.1 {code} OK\r\n'.format(code=self.code)
+        header = 'HTTP/1.1 {code} {name}\r\n'.format(code=self.code, name=client.responses[self.code])
         for head, value in self.headers.items():
             header += '{}: {}\r\n'.format(head, value)
         return '{}\r\n{}'.format(header, self.body)
