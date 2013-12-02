@@ -2,7 +2,7 @@
 import re
 import asyncio
 import signal
-import jinja2
+from jinja2 import Environment, FileSystemLoader
 import datetime
 
 from .utils import TerminalColors
@@ -25,12 +25,10 @@ class HTTPHandler(object):
         """
         raise NotImplementedError
 
-    def render(self, text, **kwargs):
-        result = ''
-        if kwargs:
-            template = jinja2.Template(text)
-            result = template.render(kwargs)
-        return result or text
+    def render(self, template_name, **kwargs):
+        template = HTTPServer._jinja_env.get_template(template_name)
+        result = template.render(kwargs)
+        return result
 
     @asyncio.coroutine
     def __call__(self, request, **kwargs):
@@ -57,6 +55,8 @@ class HTTPServer(asyncio.Protocol):
     """
     TIMEOUT = 5.0
     _handlers = {}
+    _static_path = ''
+    _jinja_env = ''
 
     def timeout(self):
         #print('connection timeout, closing.')
@@ -110,8 +110,10 @@ class Application(object):
         app.run()
 
     """
-    def __init__(self, handlers):
+    def __init__(self, handlers, settings={}):
         self._handlers = handlers
+        self._settings = settings
+        HTTPServer._jinja_env = Environment(loader=FileSystemLoader(settings.get('template_path', '')))
         HTTPServer._handlers = handlers
 
     def run(self, host='127.0.0.1', port='8888'):
