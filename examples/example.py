@@ -1,6 +1,6 @@
 import asyncio
 
-from hurricane import Application, HTTPHandler
+from hurricane.web import Application, HTTPHandler
 
 
 class HelloHandler(HTTPHandler):
