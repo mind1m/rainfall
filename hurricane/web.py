@@ -9,9 +9,19 @@ from .http import HTTPResponse, HTTPRequest
 
 
 class HTTPHandler(object):
+    """
+    Used by HTTPServer to react for some url pattern.
 
+    All handling is in handle method.
+    """
     @asyncio.coroutine
     def handle(self, request):
+        """
+        May be coroutine or a regular function.
+
+        :return text or response either explicitly
+         or via self.render() which uses jinja2 rendering.
+        """
         raise NotImplementedError
 
     def render(self, text, **kwargs):
@@ -23,7 +33,11 @@ class HTTPHandler(object):
 
     @asyncio.coroutine
     def __call__(self, request):
+        """
+        Is called by HTTPServer.
+        """
         response = HTTPResponse(code=200)
+        # this check is taken form asyncio sources
         if getattr(self.handle, '_is_coroutine', False):
             body = yield from self.handle(request)
         else:
@@ -34,7 +48,12 @@ class HTTPHandler(object):
 
 
 class HTTPServer(asyncio.Protocol):
+    """
+    Http server itself, uses asyncio.Protocol.
+    Not meant to be created manually, but by Application class.
 
+    TIMEOUT sets disconnect timeout.
+    """
     TIMEOUT = 5.0
     _handlers = {}
 
@@ -76,11 +95,25 @@ class HTTPServer(asyncio.Protocol):
 
 
 class Application(object):
+    """
+    The core class that is used to create and start server.
+
+    Example:
+        app = Application({
+            '/': HelloHandler(),
+        })
+        app.run()
+
+    """
     def __init__(self, handlers):
         self._handlers = handlers
         HTTPServer._handlers = handlers
 
     def run(self, host='127.0.0.1', port='8888'):
+        """
+        Starts server on given host and port,
+        adds Ctrl-C signal handler.
+        """
         loop = asyncio.get_event_loop()
         if signal is not None:
             loop.add_signal_handler(signal.SIGINT, loop.stop)
