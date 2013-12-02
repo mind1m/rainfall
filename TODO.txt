@@ -1,4 +1,4 @@
-- regexp in url pattern
+- ~~regexp in url pattern~~
 - exception handling
 - correct HTTP response codes
 - tests
