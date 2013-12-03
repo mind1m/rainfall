@@ -11,5 +11,5 @@ class TerminalColors:
     WHITE = NORMAL + '\033[1m'
 
 
-class HurricaneException(Exception):
+class SnowstormException(Exception):
     pass

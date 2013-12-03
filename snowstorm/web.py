@@ -9,7 +9,7 @@ import traceback
 from http import client
 from jinja2 import Environment, FileSystemLoader
 
-from .utils import TerminalColors, HurricaneException
+from .utils import TerminalColors, SnowstormException
 from .http import HTTPResponse, HTTPRequest, HTTPError
 
 
@@ -54,7 +54,7 @@ class HTTPHandler(object):
             elif isinstance(handler_result, str):
                 body = handler_result
             else:
-                raise HurricaneException("handle() result must be HTTPError or unicode, found {}".format(type(handler_result)))
+                raise SnowstormException("handle() result must be HTTPError or unicode, found {}".format(type(handler_result)))
         return (code, body)
 
 
@@ -164,19 +164,7 @@ class Application(object):
 
     def _greet(self, sock_name):
         print(
-            TerminalColors.GREEN, '\nHurricane is starting...',TerminalColors.WHITE,'\n',
-            """
-        ( ~~~~)
-       (~      ~~~)
-      (~          ~~)
-      ( ~~~~~~~~~~~)
-        """, TerminalColors.LIGHTBLUE,
-        """
-         \ \ \ \ \ \\
-          \ \ \ \ \ \\
-           ` ` ` ` ` `
-
-            """,
-            # TerminalColors.OKBLUE,  '\nBrace yourself\n\n',
+            TerminalColors.LIGHTBLUE, '\nSnowstorm is starting...',TerminalColors.WHITE,
+            '\n\u2744 ', '\u2744  '*7,
             TerminalColors.NORMAL, '\nServing on', sock_name, ':'
         )

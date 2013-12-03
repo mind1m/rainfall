@@ -2,7 +2,7 @@ from urllib import parse
 from email.utils import formatdate
 from http import client
 
-from .utils import HurricaneException
+from .utils import SnowstormException
 
 class HTTPRequest(object):
 
@@ -71,7 +71,7 @@ class HTTPResponse(object):
         self.code = code
         self.headers = {
             'Content-Type': 'text/html; charset=utf-8',
-            'Server': 'hurricane/python',
+            'Server': 'snowstorm/python',
             'Date': formatdate(timeval=None, localtime=False, usegmt=True),
         }
         self.headers.update(additional_headers)
@@ -83,7 +83,7 @@ class HTTPResponse(object):
         return '{}\r\n{}'.format(header, self.body)
 
 
-class HTTPError(HurricaneException):
+class HTTPError(SnowstormException):
     def __init__(self, code=client.INTERNAL_SERVER_ERROR, *args, **kwargs):
         self.code = code
         super().__init__(*args, **kwargs)

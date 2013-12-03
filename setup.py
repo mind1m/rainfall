@@ -1,12 +1,12 @@
 from distutils.core import setup
 
 setup(
-    name='hurricane',
+    name='snowstorm',
     version='0.8.0',
     author='Anton Kasyanov',
     author_email='antony.kasyanov@gmail.com',
-    packages=['hurricane'],
-    url='https://github.com/mind1master/hurricane',
+    packages=['snowstorm'],
+    url='https://github.com/mind1master/snowstorm',
     license="""
     Copyright 2013 Anton Kasyanov
 
