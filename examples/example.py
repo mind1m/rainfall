@@ -1,8 +1,8 @@
 import os
 import asyncio
 
-from hurricane.web import Application, HTTPHandler
-from hurricane.http import HTTPError
+from snowstorm.web import Application, HTTPHandler
+from snowstorm.http import HTTPError
 
 
 class HelloHandler(HTTPHandler):
