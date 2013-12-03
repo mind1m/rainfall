@@ -16,6 +16,7 @@ class BenchHandler(HTTPHandler):
     def handle(self, request):
         return 'Hello!'
 
+
 class ExceptionHandler(HTTPHandler):
     def handle(self, request):
         return HTTPError(403)
@@ -28,6 +29,22 @@ class IncNumberHandler(HTTPHandler):
         return self.render('base.html', number=number)
 
 
+class GetFormHandler(HTTPHandler):
+    def handle(self, request):
+        data = {}
+        if request.GET:
+            data = request.GET
+        return self.render('form.html', method='GET', data=data)
+
+
+class PostFormHandler(HTTPHandler):
+    def handle(self, request):
+        data = {}
+        if request.POST:
+            data = request.POST
+        return self.render('form.html', method='POST', data=data)
+
+
 settings = {
     'template_path': os.path.join(os.path.dirname(__file__), "templates"),
 }
@@ -37,6 +54,8 @@ app = Application(
         r'^/exc$': ExceptionHandler(),
         r'^/bench$': BenchHandler(),
         r'^/inc/(?P<number>\d+)$': IncNumberHandler(),
+        r'^/forms/get$': GetFormHandler(),
+        r'^/forms/post$': PostFormHandler(),
     },
     settings=settings,
 )

@@ -95,19 +95,18 @@ class HTTPServer(asyncio.Protocol):
     @asyncio.coroutine
     def _call_handler(self, request):
         response = None
-        path = request.path
+        path = request.path.split('?')[0]  # stripping GET params
         exc = None
 
         response = HTTPResponse()
         for pattern, handler in self._handlers.items():
-            result = re.match(pattern, request.path)
+            result = re.match(pattern, path)
             if result:
                 try:
                     code, body = yield from handler(request, **result.groupdict())
                     response.code = code
                     response.body = body
                 except Exception as e:
-                    # import ipdb; ipdb.set_trace()
                     response.code = client.INTERNAL_SERVER_ERROR
                     exc = sys.exc_info()
                 finally:
