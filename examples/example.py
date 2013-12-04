@@ -8,6 +8,8 @@ from snowstorm.http import HTTPError
 class HelloHandler(HTTPHandler):
     @asyncio.coroutine
     def handle(self, request):
+        if 'sleep' in request.GET:
+            yield from asyncio.sleep(int(request.GET['sleep']))
         return self.render('base.html')
 
 
