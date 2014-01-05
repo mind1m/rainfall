@@ -164,7 +164,6 @@ class Application(object):
 
     def _greet(self, sock_name):
         print(
-            TerminalColors.LIGHTBLUE, '\nRainfall is starting...',TerminalColors.WHITE,
-            '\n\u2744 ', '\u2744  '*7,
-            TerminalColors.NORMAL, '\nServing on', sock_name, ':'
+            TerminalColors.LIGHTBLUE, '\nRainfall is starting...','\u2602 ',TerminalColors.WHITE,
+            TerminalColors.NORMAL, '\nServing on', sock_name, ''
         )
