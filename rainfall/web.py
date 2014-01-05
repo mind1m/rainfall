@@ -6,6 +6,8 @@ import signal
 import datetime
 import traceback
 
+from concurrent.futures import ThreadPoolExecutor
+
 from http import client
 from jinja2 import Environment, FileSystemLoader
 
@@ -138,29 +140,45 @@ class Application(object):
         app.run()
 
     """
-    def __init__(self, handlers, settings={}):
-        self._handlers = handlers
-        self._settings = settings
+    def __init__(self, handlers, settings=None):
+        self.settings = settings or {}
+        if not 'host' in self.settings:
+            self.settings['host'] = '127.0.0.1'
+
+        if not 'port' in self.settings:
+            self.settings['port'] = '8888'
+
         HTTPServer._jinja_env = Environment(loader=FileSystemLoader(settings.get('template_path', '')))
         HTTPServer._handlers = handlers
 
-    def run(self, host='127.0.0.1', port='8888'):
+    def run(self, silent=False, process_queue=None):
         """
-        Starts server on given host and port,
+        Starts server on host and port given in settings,
         adds Ctrl-C signal handler.
         """
+        self.host = self.settings['host']
+        self.port = self.settings['port']
+
         loop = asyncio.get_event_loop()
+
         if signal is not None:
             loop.add_signal_handler(signal.SIGINT, loop.stop)
 
-        self._start_server(loop, host, port)
+        self._start_server(loop, self.host, self.port)
+
+        if process_queue:
+            # used in tests for multiprocess communication
+            process_queue.put('started')
+
+        self.silent = silent
+        if not silent:
+            self._greet(self.host + ':' + self.port)
 
         loop.run_forever()
 
     def _start_server(self, loop, host, port):
         f = loop.create_server(HTTPServer, host, port)
         s = loop.run_until_complete(f)
-        self._greet(s.sockets[0].getsockname())
 
     def _greet(self, sock_name):
         print(

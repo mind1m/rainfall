@@ -10,7 +10,7 @@ class HelloHandler(HTTPHandler):
     def handle(self, request):
         if 'sleep' in request.GET:
             yield from asyncio.sleep(int(request.GET['sleep']))
-        return self.render('base.html')
+        return 'Hello!'
 
 
 class BenchHandler(HTTPHandler):
