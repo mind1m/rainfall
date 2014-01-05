@@ -1,12 +1,12 @@
 from distutils.core import setup
 
 setup(
-    name='snowstorm',
+    name='rainfall',
     version='0.8.0',
     author='Anton Kasyanov',
     author_email='antony.kasyanov@gmail.com',
-    packages=['snowstorm'],
-    url='https://github.com/mind1master/snowstorm',
+    packages=['rainfall'],
+    url='https://github.com/mind1master/rainfall',
     license="""
     Copyright 2013 Anton Kasyanov
 

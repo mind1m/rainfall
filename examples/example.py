@@ -1,8 +1,8 @@
 import os
 import asyncio
 
-from snowstorm.web import Application, HTTPHandler
-from snowstorm.http import HTTPError
+from rainfall.web import Application, HTTPHandler
+from rainfall.http import HTTPError
 
 
 class HelloHandler(HTTPHandler):
