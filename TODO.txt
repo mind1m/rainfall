@@ -1,7 +1,3 @@
-- ~~regexp in url pattern~~
-- exception handling
-- correct HTTP response codes
 - tests
-- ~~emplate loading and passing to jinja~~
+- logging
 - static files
-- POST processing
