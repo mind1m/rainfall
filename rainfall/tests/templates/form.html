@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rainfall example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <form action="" method={{ method }}>
+      <p>Name: <input name="name" type="text" placeholder="Your name please">
+      <p>Random number: <input name="number" type="text" placeholder="Random number please">
+      <p><input type="submit" value="Send">
+    </form>
+    {% if data %}
+      <p><h4>You have submitted:</h4>
+      <p>Name: {{ data['name'] }}
+      <p>Number: {{ data['number'] }}
+    {% endif %}
+  </body>
+</html>

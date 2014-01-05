@@ -1,18 +1,20 @@
 import unittest
 import multiprocessing
-import http.client
+import http.client, urllib.parse
 
 
 class TestClient(object):
     def __init__(self, host, port):
         self.conn = http.client.HTTPConnection(host, port)
 
-    def query(self, url, method='GET'):
+    def query(self, url, method='GET', params=None):
         """
         Run a query using url and method.
         Returns response with status, reason, body
         """
-        self.conn.request(method, url)
+        if params:
+            params = urllib.parse.urlencode(params)
+        self.conn.request(method, url, params)
         r = self.conn.getresponse()
         r.body = r.read().decode("utf-8")  # converting to unicode
         return r

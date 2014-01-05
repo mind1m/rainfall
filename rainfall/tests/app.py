@@ -6,29 +6,35 @@ from rainfall.http import HTTPError
 
 
 class HelloHandler(HTTPHandler):
-    @asyncio.coroutine
-    def handle(self, request):
-        if 'sleep' in request.GET:
-            yield from asyncio.sleep(int(request.GET['sleep']))
-        return 'Hello!'
-
-
-class BenchHandler(HTTPHandler):
-    @asyncio.coroutine
     def handle(self, request):
         return 'Hello!'
 
 
-class ExceptionHandler(HTTPHandler):
+class TemplateHandler(HTTPHandler):
+    def handle(self, request):
+        return self.render('base.html', text='Rendered')
+
+
+class HTTPErrorHandler(HTTPHandler):
     def handle(self, request):
         return HTTPError(403)
 
 
-class IncNumberHandler(HTTPHandler):
+class ExceptionHandler(HTTPHandler):
+    def handle(self, request):
+        raise Exception('Fail')
+
+
+class SleepHandler(HTTPHandler):
     @asyncio.coroutine
+    def handle(self, request):
+        yield from asyncio.sleep(0.1)
+        return 'Done'
+
+
+class ParamHandler(HTTPHandler):
     def handle(self, request, number):
-        number = int(number)
-        return self.render('base.html', number=number)
+        return number
 
 
 class GetFormHandler(HTTPHandler):
@@ -53,9 +59,15 @@ settings = {
 app = Application(
     {
         r'^/$': HelloHandler(),
-        r'^/exc$': ExceptionHandler(),
-        r'^/bench$': BenchHandler(),
-        r'^/inc/(?P<number>\d+)$': IncNumberHandler(),
+        r'^/template$': TemplateHandler(),
+
+        r'^/http_error$': HTTPErrorHandler(),
+        r'^/exc_error$': ExceptionHandler(),
+
+        r'^/sleep$': SleepHandler(),
+
+        r'^/param/(?P<number>\d+)$': ParamHandler(),
+
         r'^/forms/get$': GetFormHandler(),
         r'^/forms/post$': PostFormHandler(),
     },

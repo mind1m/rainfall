@@ -47,12 +47,9 @@ class HTTPRequest(object):
     @property
     def POST(self):
         if not self.__POST and self.method == 'POST':
-            content_type = self.headers.get('Content-Type', None)
-            # TODO add form-data
-            if content_type == 'application/x-www-form-urlencoded':
-                self.__POST = parse.parse_qs(self.body)
-                for k,v in self.__POST.items():
-                    self.__POST[k] = v[0]
+            self.__POST = parse.parse_qs(self.body)
+            for k,v in self.__POST.items():
+                self.__POST[k] = v[0]
         return self.__POST
 
     @property

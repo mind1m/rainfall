@@ -48,7 +48,7 @@ class HTTPHandler(object):
         if getattr(self.handle, '_is_coroutine', False):
             handler_result = yield from self.handle(request, **kwargs)
         else:
-            handler_result = self.handle(request)
+            handler_result = self.handle(request, **kwargs)
 
         if handler_result:
             if isinstance(handler_result, HTTPError):
