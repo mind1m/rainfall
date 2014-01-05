@@ -4,4 +4,4 @@ build/
 env/
 .DS_Store
 *.pyc
-
+tests.log

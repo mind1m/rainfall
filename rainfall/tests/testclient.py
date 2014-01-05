@@ -1,3 +1,4 @@
+import os
 import unittest
 import multiprocessing
 import http.client, urllib.parse
@@ -24,8 +25,12 @@ class RainfallTestCase(unittest.TestCase):
     app = None  # app to test, specify in your test case
 
     def setUp(self):
+        if not self.app.settings.get('logfile_path'):
+            self.app.settings['logfile_path'] = os.path.join(os.path.dirname(__file__), 'tests.log')
+
         q = multiprocessing.SimpleQueue()
-        self.server_process = multiprocessing.Process(target=self.app.run, kwargs={'silent': True, 'process_queue': q})
+        self.server_process = multiprocessing.Process(target=self.app.run,
+            kwargs={'process_queue': q, 'greeting': False})
         self.server_process.start()
 
         # waiting for server to start

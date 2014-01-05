@@ -55,6 +55,7 @@ class PostFormHandler(HTTPHandler):
 
 settings = {
     'template_path': os.path.join(os.path.dirname(__file__), "templates"),
+    # 'logfile_path': os.path.join(os.path.dirname(__file__), "tests.log"),
 }
 app = Application(
     {

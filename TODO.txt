@@ -1,3 +1,2 @@
-- tests
-- logging
+- coverage, more tests?
 - static files

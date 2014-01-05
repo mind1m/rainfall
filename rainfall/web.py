@@ -5,6 +5,7 @@ import asyncio
 import signal
 import datetime
 import traceback
+import logging
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -120,10 +121,10 @@ class HTTPServer(asyncio.Protocol):
             response.body = "<h1>{} {}</h1>".format(response.code, client.responses[response.code])
 
         self.transport.write(response.compose().encode())
-        print(datetime.datetime.now(), request.method, request.path, response.code)
+        logging.info('{} {} {}'.format(request.method, request.path, response.code))
 
         if exc:
-            traceback.print_exception(*exc)
+            logging.error(''.join(traceback.format_exception(*exc)))
 
     def connection_lost(self, exc):
         self.h_timeout.cancel()
@@ -151,13 +152,26 @@ class Application(object):
         HTTPServer._jinja_env = Environment(loader=FileSystemLoader(settings.get('template_path', '')))
         HTTPServer._handlers = handlers
 
-    def run(self, silent=False, process_queue=None):
+    def run(self, process_queue=None, greeting=True):
         """
         Starts server on host and port given in settings,
         adds Ctrl-C signal handler.
         """
         self.host = self.settings['host']
         self.port = self.settings['port']
+
+        # logging confi
+        logfile_path = self.settings.get('logfile_path', None)
+        if logfile_path:
+            logging.basicConfig(
+                filename=logfile_path, level=logging.INFO,
+                format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'
+            )
+        else:
+            logging.basicConfig(
+                level=logging.INFO,
+                format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'
+            )
 
         loop = asyncio.get_event_loop()
 
@@ -170,9 +184,8 @@ class Application(object):
             # used in tests for multiprocess communication
             process_queue.put('started')
 
-        self.silent = silent
-        if not silent:
-            self._greet(self.host + ':' + self.port)
+        if greeting:
+            self._greet(self.host + ':' + self.port, logfile_path)
 
         loop.run_forever()
 
@@ -180,8 +193,11 @@ class Application(object):
         f = loop.create_server(HTTPServer, host, port)
         s = loop.run_until_complete(f)
 
-    def _greet(self, sock_name):
+    def _greet(self, sock_name, logfile_path):
+        # works with print only
         print(
             TerminalColors.LIGHTBLUE, '\nRainfall is starting...','\u2602 ',TerminalColors.WHITE,
-            TerminalColors.NORMAL, '\nServing on', sock_name, ''
+            TerminalColors.NORMAL, '\nServing on', sock_name, '\n'
         )
+        if logfile_path:
+            print('Logging set to {}'.format(logfile_path))
