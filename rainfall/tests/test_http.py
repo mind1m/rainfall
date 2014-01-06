@@ -1,6 +1,6 @@
 import time
 
-from testclient import RainfallTestCase
+from rainfall.unittest import RainfallTestCase
 from app import app
 
 class HTTPTestCase(RainfallTestCase):
