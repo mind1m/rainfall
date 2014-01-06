@@ -6,11 +6,15 @@
 Welcome to rainfall's documentation!
 ====================================
 
+This is a micro asyncio web framework, a bit similiar to cyclone or tornado.
+
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   quickstart.rst
    api.rst
 
 Indices and tables

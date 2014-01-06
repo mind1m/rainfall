@@ -2,6 +2,9 @@
 API Reference
 ====================================
 
+This docs are generated from the docstirngs.
+Apart from that, feel free to study source code directly.
+
 rainfall.web
 ------------------------------------
 
@@ -16,11 +19,11 @@ rainfall.http
    :members:
 
 
+rainfall.unittest
+------------------------------------
 
-Indices and tables
-==================
+.. automodule:: rainfall.unittest
+   :members:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+
 

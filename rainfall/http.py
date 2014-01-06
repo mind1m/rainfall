@@ -115,6 +115,11 @@ class HTTPResponse(object):
 
 
 class HTTPError(RainfallException):
+    """
+    Representes different http errors that you can return in handlers.
+
+    :param code: http error code
+    """
     def __init__(self, code=client.INTERNAL_SERVER_ERROR, *args, **kwargs):
         self.code = code
         super().__init__(*args, **kwargs)

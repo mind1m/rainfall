@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="rainfall 0.8.0 documentation" href="index.html" />
-    <link rel="prev" title="Welcome to rainfall’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to rainfall’s documentation!"
+          <a href="quickstart.html" title="Quickstart"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">rainfall 0.8.0 documentation</a> &raquo;</li> 
       </ul>
@@ -50,6 +50,8 @@
             
   <div class="section" id="api-reference">
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<p>This docs are generated from the docstirngs.
+Apart from that, feel free to study source code directly.</p>
 <div class="section" id="module-rainfall.web">
 <span id="rainfall-web"></span><h2>rainfall.web<a class="headerlink" href="#module-rainfall.web" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -163,6 +165,20 @@ Not meant to be created manually, but by Application class.</p>
 </div>
 <div class="section" id="module-rainfall.http">
 <span id="rainfall-http"></span><h2>rainfall.http<a class="headerlink" href="#module-rainfall.http" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="rainfall.http.HTTPError">
+<em class="property">exception </em><tt class="descclassname">rainfall.http.</tt><tt class="descname">HTTPError</tt><big>(</big><em>code=500</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#rainfall.http.HTTPError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Representes different http errors that you can return in handlers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>code</strong> &#8211; http error code</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="class">
 <dt id="rainfall.http.HTTPRequest">
 <em class="property">class </em><tt class="descclassname">rainfall.http.</tt><tt class="descname">HTTPRequest</tt><big>(</big><em>raw</em><big>)</big><a class="headerlink" href="#rainfall.http.HTTPRequest" title="Permalink to this definition">¶</a></dt>
@@ -289,14 +305,45 @@ Not meant to be created manually, but by Application class.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-rainfall.unittest">
+<span id="rainfall-unittest"></span><h2>rainfall.unittest<a class="headerlink" href="#module-rainfall.unittest" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="rainfall.unittest.RainfallTestCase">
+<em class="property">class </em><tt class="descclassname">rainfall.unittest.</tt><tt class="descname">RainfallTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="headerlink" href="#rainfall.unittest.RainfallTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use it for your rainfall test cases.
+In setUp rainfall server is starting in the separate Process.</p>
+<p>You are required to specify an app variable for tests.
+E.g.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">example</span> <span class="kn">import</span> <span class="n">my_first_app</span>
+
+
+<span class="k">class</span> <span class="nc">HTTPTestCase</span><span class="p">(</span><span class="n">RainfallTestCase</span><span class="p">):</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">my_first_app</span>
+
+    <span class="k">def</span> <span class="nf">test_basic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="s">&#39;Hello!&#39;</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
+<p>Inside you can use TestClient&#8217;s instance via self.client</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="rainfall.unittest.TestClient">
+<em class="property">class </em><tt class="descclassname">rainfall.unittest.</tt><tt class="descname">TestClient</tt><big>(</big><em>host</em>, <em>port</em><big>)</big><a class="headerlink" href="#rainfall.unittest.TestClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper to make request to the rainfall app.
+Created automatically by RainfallTestCase.</p>
+<dl class="method">
+<dt id="rainfall.unittest.TestClient.query">
+<tt class="descname">query</tt><big>(</big><em>url</em>, <em>method='GET'</em>, <em>params=None</em><big>)</big><a class="headerlink" href="#rainfall.unittest.TestClient.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a query using url and method.
+Returns response object with status, reason, body</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -310,14 +357,14 @@ Not meant to be created manually, but by Application class.</p>
 <li><a class="reference internal" href="#">API Reference</a><ul>
 <li><a class="reference internal" href="#module-rainfall.web">rainfall.web</a></li>
 <li><a class="reference internal" href="#module-rainfall.http">rainfall.http</a></li>
+<li><a class="reference internal" href="#module-rainfall.unittest">rainfall.unittest</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to rainfall&#8217;s documentation!</a></p>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quickstart</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/api.txt"
@@ -350,7 +397,7 @@ Not meant to be created manually, but by Application class.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to rainfall’s documentation!"
+          <a href="quickstart.html" title="Quickstart"
              >previous</a> |</li>
         <li><a href="index.html">rainfall 0.8.0 documentation</a> &raquo;</li> 
       </ul>
