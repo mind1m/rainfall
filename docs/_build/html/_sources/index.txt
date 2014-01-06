@@ -15,6 +15,7 @@ Contents:
    :maxdepth: 2
 
    quickstart.rst
+   features.rst
    api.rst
 
 Indices and tables

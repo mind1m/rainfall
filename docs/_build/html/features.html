@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Features &mdash; rainfall 0.8.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="rainfall 0.8.0 documentation" href="index.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">rainfall 0.8.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<p>Rainfall comes with a list of features, more are in development.
+If you feel that rainfall is missing a feature, please let me know.</p>
+<div class="section" id="coroutines">
+<h2>Coroutines<a class="headerlink" href="#coroutines" title="Permalink to this headline">¶</a></h2>
+<p>Rainfall&#8217;s <a class="reference internal" href="api.html#rainfall.web.HTTPHandler.handle" title="rainfall.web.HTTPHandler.handle"><tt class="xref py py-func docutils literal"><span class="pre">rainfall.web.HTTPHandler.handle()</span></tt></a> may be a regular function or <cite>asyncio.coroutine</cite> and use all the asynchronous features like <cite>yield from</cite>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SleepHandler</span><span class="p">(</span><span class="n">HTTPHandler</span><span class="p">):</span>
+    <span class="nd">@asyncio.coroutine</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">yield from</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;Done&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="template-rendering">
+<h2>Template rendering<a class="headerlink" href="#template-rendering" title="Permalink to this headline">¶</a></h2>
+<p>Rainfall uses Jinja2 if you need to render a template.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">TemplateHandler</span><span class="p">(</span><span class="n">HTTPHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s">&#39;base.html&#39;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">&#39;Rendered&#39;</span><span class="p">)</span>
+
+
+<span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;template_path&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&quot;templates&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s">r&#39;^/template$&#39;</span><span class="p">:</span> <span class="n">TemplateHandler</span><span class="p">(),</span>
+    <span class="p">},</span>
+    <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="url-params">
+<h2>Url params<a class="headerlink" href="#url-params" title="Permalink to this headline">¶</a></h2>
+<p>You can easily handle urls with params inside</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ParamHandler</span><span class="p">(</span><span class="n">HTTPHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">number</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s">r&#39;^/param/(?P&lt;number&gt;\d+)$&#39;</span><span class="p">:</span> <span class="n">ParamHandler</span><span class="p">(),</span>
+
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-and-post-params">
+<h2>GET and POST params<a class="headerlink" href="#get-and-post-params" title="Permalink to this headline">¶</a></h2>
+<p>Using <a class="reference internal" href="api.html#rainfall.http.HTTPRequest.GET" title="rainfall.http.HTTPRequest.GET"><tt class="xref py py-func docutils literal"><span class="pre">rainfall.http.HTTPRequest.GET()</span></tt></a> and <a class="reference internal" href="api.html#rainfall.http.HTTPRequest.POST" title="rainfall.http.HTTPRequest.POST"><tt class="xref py py-func docutils literal"><span class="pre">rainfall.http.HTTPRequest.POST()</span></tt></a> you can easily handle forms data.</p>
+</div>
+<div class="section" id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<p>Rainfall uses standart python <cite>logging</cite> module.
+To configure the file for logs, use <cite>logfile_path</cite> in Application settings.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>To test the rainfall apps you can use <a class="reference internal" href="api.html#rainfall.unittest.RainfallTestCase" title="rainfall.unittest.RainfallTestCase"><tt class="xref py py-class docutils literal"><span class="pre">rainfall.unittest.RainfallTestCase</span></tt></a></p>
+<p><cite>example.py</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">rainfall.web</span> <span class="kn">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">HTTPHandler</span>
+
+
+<span class="k">class</span> <span class="nc">HelloHandler</span><span class="p">(</span><span class="n">HTTPHandler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;Hello!&#39;</span>
+
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s">r&#39;^/$&#39;</span><span class="p">:</span> <span class="n">HelloHandler</span><span class="p">(),</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c"># this is important for tests</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><cite>test_basic.py</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">rainfall.unittest</span> <span class="kn">import</span> <span class="n">RainfallTestCase</span>
+
+<span class="kn">from</span> <span class="nn">example</span> <span class="kn">import</span> <span class="n">app</span>
+
+<span class="k">class</span> <span class="nc">HTTPTestCase</span><span class="p">(</span><span class="n">RainfallTestCase</span><span class="p">):</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">app</span>
+
+    <span class="k">def</span> <span class="nf">test_basic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="s">&#39;Hello!&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Features</a><ul>
+<li><a class="reference internal" href="#coroutines">Coroutines</a></li>
+<li><a class="reference internal" href="#template-rendering">Template rendering</a></li>
+<li><a class="reference internal" href="#url-params">Url params</a></li>
+<li><a class="reference internal" href="#get-and-post-params">GET and POST params</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quickstart</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api.html"
+                        title="next chapter">API Reference</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/features.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             >previous</a> |</li>
+        <li><a href="index.html">rainfall 0.8.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Anton Kasyanov.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.
+    </div>
+  </body>
+</html>

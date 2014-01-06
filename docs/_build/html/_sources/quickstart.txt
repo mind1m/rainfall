@@ -3,9 +3,8 @@ Quickstart
 ====================================
 
 
-To start off, rainfall is a micro web framework around asyncio (ex tulip), similiar to the cyclone or tornado. Since it is asyncio based, rainfall is fully asyncronous.
-
-The performance tests have shown that rainfall is not slower then twisted+cyclone and sometimes even faster (benchmark results will be posted later or you can test it by yourself).
+Rainfall comes with a list of features, more are in development.
+If you feel that rainfall is missing a feature, please let me know.
 
 Installation
 ------------------------------------
@@ -28,6 +27,7 @@ Let's create a simple hello world app in example.py file like this::
 
 
     class HelloHandler(HTTPHandler):
+        @asyncio.coroutine
         def handle(self, request):
             return 'Hello!'
 
@@ -58,3 +58,6 @@ Testing
 -------------------------------------
 
 To test the rainfall apps you can use :class:`rainfall.unittest.RainfallTestCase`
+
+
+For more, see :doc:`features`

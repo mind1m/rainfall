@@ -27,10 +27,10 @@ class HTTPHandler(object):
         """
         May be an asyncio.coroutine or a regular function
 
-        :param request: rainfall.http.HTTPRequest
+        :param request: :class:`rainfall.http.HTTPRequest`
         :param kwargs: arguments from url if any
 
-        :rtype: str (may be rendered with self.render()) or HTTPError
+        :rtype: str (may be rendered with self.render()) or :class:`rainfall.http.HTTPError`
         """
         raise NotImplementedError
 
@@ -50,7 +50,7 @@ class HTTPHandler(object):
     @asyncio.coroutine
     def __call__(self, request, **kwargs):
         """
-        Is called by HTTPServer.
+        Is called by :class:`rainfall.web.HTTPServer`
 
         :rtype: (code, body)
         """
@@ -68,14 +68,14 @@ class HTTPHandler(object):
             elif isinstance(handler_result, str):
                 body = handler_result
             else:
-                raise RainfallException("handle() result must be HTTPError or unicode, found {}".format(type(handler_result)))
+                raise RainfallException("handle() result must be rainfall.web.HTTPServer or str, found {}".format(type(handler_result)))
         return (code, body)
 
 
 class HTTPServer(asyncio.Protocol):
     """
     Http server itself, uses asyncio.Protocol.
-    Not meant to be created manually, but by Application class.
+    Not meant to be created manually, but by `rainfall.web.Application` class.
     """
     TIMEOUT = 5.0
     _handlers = {}
