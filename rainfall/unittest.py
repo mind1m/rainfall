@@ -1,7 +1,8 @@
 import os
 import unittest
 import multiprocessing
-import http.client, urllib.parse
+import http.client
+import urllib.parse
 
 
 class TestClient(object):
@@ -50,11 +51,15 @@ class RainfallTestCase(unittest.TestCase):
 
     def setUp(self):
         if not self.app.settings.get('logfile_path'):
-            self.app.settings['logfile_path'] = os.path.join(os.path.dirname(__file__), 'tests.log')
+            self.app.settings['logfile_path'] = os.path.join(
+                os.path.dirname(__file__), 'tests.log'
+            )
 
         q = multiprocessing.SimpleQueue()
-        self.server_process = multiprocessing.Process(target=self.app.run,
-            kwargs={'process_queue': q, 'greeting': False})
+        self.server_process = multiprocessing.Process(
+            target=self.app.run,
+            kwargs={'process_queue': q, 'greeting': False}
+        )
         self.server_process.start()
 
         # waiting for server to start
@@ -65,7 +70,3 @@ class RainfallTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.server_process.terminate()
-
-
-if __name__ == '__main__':
-    unittest.main()

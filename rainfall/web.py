@@ -68,7 +68,11 @@ class HTTPHandler(object):
             elif isinstance(handler_result, str):
                 body = handler_result
             else:
-                raise RainfallException("handle() result must be rainfall.web.HTTPServer or str, found {}".format(type(handler_result)))
+                raise RainfallException(
+                    "handle() result must be rainfall.web.HTTPServer or str, found {}".format(
+                        type(handler_result)
+                    )
+                )
         return (code, body)
 
 
@@ -114,7 +118,9 @@ class HTTPServer(asyncio.Protocol):
             result = re.match(pattern, path)
             if result:
                 try:
-                    code, body = yield from handler(request, **result.groupdict())
+                    code, body = yield from handler(
+                        request, **result.groupdict()
+                    )
                     response.code = code
                     response.body = body
                 except Exception as e:
@@ -123,13 +129,17 @@ class HTTPServer(asyncio.Protocol):
                 finally:
                     break
         else:
-            response.code=client.NOT_FOUND
+            response.code = client.NOT_FOUND
 
         if response.code != 200:
-            response.body = "<h1>{} {}</h1>".format(response.code, client.responses[response.code])
+            response.body = "<h1>{} {}</h1>".format(
+                response.code, client.responses[response.code]
+            )
 
         self.transport.write(response.compose().encode())
-        logging.info('{} {} {}'.format(request.method, request.path, response.code))
+        logging.info('{} {} {}'.format(
+            request.method, request.path, response.code)
+        )
 
         if exc:
             logging.error(''.join(traceback.format_exception(*exc)))
@@ -170,7 +180,9 @@ class Application(object):
         if not 'port' in self.settings:
             self.settings['port'] = '8888'
 
-        HTTPServer._jinja_env = Environment(loader=FileSystemLoader(settings.get('template_path', '')))
+        HTTPServer._jinja_env = Environment(
+            loader=FileSystemLoader(settings.get('template_path', ''))
+        )
         HTTPServer._handlers = handlers
 
     def run(self, process_queue=None, greeting=True):
@@ -220,7 +232,7 @@ class Application(object):
     def _greet(self, sock_name, logfile_path):
         # works with print only
         print(
-            TerminalColors.LIGHTBLUE, '\nRainfall is starting...','\u2602 ',TerminalColors.WHITE,
+            TerminalColors.LIGHTBLUE, '\nRainfall is starting...', '\u2602 ',
             TerminalColors.NORMAL, '\nServing on', sock_name, '\n'
         )
         if logfile_path:

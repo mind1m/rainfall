@@ -3,6 +3,7 @@ import time
 from rainfall.unittest import RainfallTestCase
 from app import app
 
+
 class HTTPTestCase(RainfallTestCase):
     app = app
 
@@ -48,8 +49,10 @@ class HTTPTestCase(RainfallTestCase):
         self.assertTrue('Number: 42' in r.body)
 
     def test_form_post(self):
-        r = self.client.query('/forms/post', method='POST',
-            params={'name': 'Anton', 'number': 42})
+        r = self.client.query(
+            '/forms/post', method='POST',
+            params={'name': 'Anton', 'number': 42}
+        )
 
         self.assertEqual(r.status, 200)
         self.assertTrue('Name: Anton' in r.body)

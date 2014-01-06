@@ -4,6 +4,7 @@ from http import client
 
 from .utils import RainfallException
 
+
 class HTTPRequest(object):
     """
     Rainfall implementation of the http request.
@@ -67,7 +68,7 @@ class HTTPRequest(object):
         """
         if not self.__POST and self.method == 'POST':
             self.__POST = parse.parse_qs(self.body)
-            for k,v in self.__POST.items():
+            for k, v in self.__POST.items():
                 self.__POST[k] = v[0]
         return self.__POST
 
@@ -78,7 +79,7 @@ class HTTPRequest(object):
         """
         if not self.__GET and self.method == 'GET' and len(self.path.split('?')) == 2:
             self.__GET = parse.parse_qs(self.path.split('?')[1])
-            for k,v in self.__GET.items():
+            for k, v in self.__GET.items():
                 self.__GET[k] = v[0]
         return self.__GET
 
@@ -108,7 +109,9 @@ class HTTPResponse(object):
 
         :rtype: str, composed http response
         """
-        header = 'HTTP/1.1 {code} {name}\r\n'.format(code=self.code, name=client.responses[self.code])
+        header = 'HTTP/1.1 {code} {name}\r\n'.format(
+            code=self.code, name=client.responses[self.code]
+        )
         for head, value in self.headers.items():
             header += '{}: {}\r\n'.format(head, value)
         return '{}\r\n{}'.format(header, self.body)

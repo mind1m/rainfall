@@ -13,4 +13,3 @@ class TerminalColors:
 
 class RainfallException(Exception):
     pass
-
