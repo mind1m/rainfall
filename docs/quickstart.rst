@@ -2,9 +2,10 @@
 Quickstart
 ====================================
 
+To start off, rainfall is a micro web framework around asyncio (ex tulip), similiar to the cyclone or tornado. Since it is asyncio based, rainfall is fully asyncronous.
 
-Rainfall comes with a list of features, more are in development.
-If you feel that rainfall is missing a feature, please let me know.
+The performance tests have shown that rainfall is not slower then twisted+cyclone and sometimes even faster (benchmark results will be posted later or you can test it by yourself).
+
 
 Installation
 ------------------------------------
