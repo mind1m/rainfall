@@ -1,8 +1,8 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='rainfall',
-    version='0.8.1',
+    version='0.8.2',
     author='Anton Kasyanov',
     author_email='antony.kasyanov@gmail.com',
     packages=['rainfall'],
@@ -22,7 +22,7 @@ setup(
     WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
     License for the specific language governing permissions and limitations""",
     description='Micro web framework around asyncio (ex tulip)',
-    requires=[
+    install_requires=[
         "asyncio",
         "jinja2"
     ],
@@ -31,5 +31,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
+        "Topic :: Internet :: WWW/HTTP",
+        "Environment :: Web Environment",
     ],
 )
