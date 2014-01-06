@@ -1,2 +1,3 @@
 asyncio
 jinja2
+sphinx
