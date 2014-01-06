@@ -20,18 +20,29 @@ class HTTPHandler(object):
     """
     Used by HTTPServer to react for some url pattern.
 
-    All handling is in handle method.
+    All handling happens in handle method.
     """
     @asyncio.coroutine
     def handle(self, request, **kwargs):
         """
-        May be coroutine or a regular function.
+        May be an asyncio.coroutine or a regular function
 
-        :return str (may be rendered with self.render()) or HTTPError
+        :param request: rainfall.http.HTTPRequest
+        :param kwargs: arguments from url if any
+
+        :rtype: str (may be rendered with self.render()) or HTTPError
         """
         raise NotImplementedError
 
     def render(self, template_name, **kwargs):
+        """
+        Uses jinja2 to render a template
+
+        :param template_name: what file to render
+        :param kwargs: arguments to pass to jinja's render
+
+        :rtype: rendered string
+        """
         template = HTTPServer._jinja_env.get_template(template_name)
         result = template.render(kwargs)
         return result
@@ -41,7 +52,7 @@ class HTTPHandler(object):
         """
         Is called by HTTPServer.
 
-        :return (code, body)
+        :rtype: (code, body)
         """
         code = 200
         body = ''
@@ -65,8 +76,6 @@ class HTTPServer(asyncio.Protocol):
     """
     Http server itself, uses asyncio.Protocol.
     Not meant to be created manually, but by Application class.
-
-    TIMEOUT sets disconnect timeout.
     """
     TIMEOUT = 5.0
     _handlers = {}
@@ -74,7 +83,6 @@ class HTTPServer(asyncio.Protocol):
     _jinja_env = ''
 
     def timeout(self):
-        #print('connection timeout, closing.')
         self.transport.close()
 
     def connection_made(self, transport):
@@ -132,9 +140,19 @@ class HTTPServer(asyncio.Protocol):
 
 class Application(object):
     """
-    The core class that is used to create and start server.
+    The core class that is used to create and start server
 
-    Example:
+    :param handlers: dict with url keys and HTTPHandler instance values
+    :param settings: dict of app settings, defaults are
+        settings = {
+            'host': '127.0.0.1',
+            'port': 8888,
+            'logfile_path': None,
+            'template_path': None,
+        }
+
+    Example::
+
         app = Application({
             '/': HelloHandler(),
         })
@@ -142,6 +160,9 @@ class Application(object):
 
     """
     def __init__(self, handlers, settings=None):
+        """
+        Creates an Application that can be started or tested
+        """
         self.settings = settings or {}
         if not 'host' in self.settings:
             self.settings['host'] = '127.0.0.1'
@@ -156,11 +177,14 @@ class Application(object):
         """
         Starts server on host and port given in settings,
         adds Ctrl-C signal handler.
+
+        :param process_queue: SimpleQueue, used by testing framework
+        :param greeting: bool, wheather to print to strout or not
         """
         self.host = self.settings['host']
         self.port = self.settings['port']
 
-        # logging confi
+        # logging config
         logfile_path = self.settings.get('logfile_path', None)
         if logfile_path:
             logging.basicConfig(
