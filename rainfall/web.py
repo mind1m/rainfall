@@ -174,6 +174,7 @@ class Application(object):
         Creates an Application that can be started or tested
         """
         self.settings = settings or {}
+
         if not 'host' in self.settings:
             self.settings['host'] = '127.0.0.1'
 
@@ -181,7 +182,7 @@ class Application(object):
             self.settings['port'] = '8888'
 
         HTTPServer._jinja_env = Environment(
-            loader=FileSystemLoader(settings.get('template_path', ''))
+            loader=FileSystemLoader(self.settings.get('template_path', ''))
         )
         HTTPServer._handlers = handlers
 
