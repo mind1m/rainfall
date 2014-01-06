@@ -11,10 +11,10 @@ Installation
 
 As simple as::
 
-    pip3 install rainfall
+    pip install rainfall
 
 .. note::
-    usually pip for python 3 is called pip3, but you may have it with other name
+    sometimes pip for python 3 is called pip3, but you may have it with other name
 
 
 Hello world
