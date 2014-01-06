@@ -1,6 +1,7 @@
 __pycache__/
 dist/
 build/
+_build/
 env/
 .DS_Store
 *.pyc

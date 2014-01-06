@@ -8,7 +8,7 @@ setup(
     packages=['rainfall'],
     url='https://github.com/mind1master/rainfall',
     license="""
-    Copyright 2013 Anton Kasyanov
+    Copyright 2014 Anton Kasyanov
 
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -21,7 +21,7 @@ setup(
     distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
     WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
     License for the specific language governing permissions and limitations""",
-    description='Tornado-like wrapper around python3 asyncio (tulip)',
+    description='Micro web framework around asyncio (ex tulip)',
     # long_description=open('README.txt').read(),
     requires=[
         "asyncio",
