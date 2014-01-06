@@ -2,5 +2,6 @@
 setup.py
 rainfall/__init__.py
 rainfall/http.py
+rainfall/unittest.py
 rainfall/utils.py
 rainfall/web.py

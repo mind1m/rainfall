@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='rainfall',
-    version='0.8.0',
+    version='0.8.1',
     author='Anton Kasyanov',
     author_email='antony.kasyanov@gmail.com',
     packages=['rainfall'],
@@ -22,7 +22,6 @@ setup(
     WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
     License for the specific language governing permissions and limitations""",
     description='Micro web framework around asyncio (ex tulip)',
-    # long_description=open('README.txt').read(),
     requires=[
         "asyncio",
         "jinja2"
