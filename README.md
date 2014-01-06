@@ -1,1 +1,1 @@
-Tornado-like wrapper around python3 asyncio (tulip)
+.. include docs/quickstart.rst
