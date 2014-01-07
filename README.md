@@ -51,4 +51,5 @@ Docs
 ======================================
 
 For documentation go to http://rainfall.readthedocs.org/
+
 More examples here https://github.com/mind1master/rainfall/blob/master/rainfall/tests/app.py
