@@ -26,9 +26,10 @@ class HTTPHandler(object):
     def __init__(self):
         self._headers = {}
 
-    def set_header(self, header_name, header_value):
+    def __set_header(self, header_name, header_value):
         """
         Set (or unset) a particular header for response
+
         :param header_name: Name of header to set
         :param header_value: Value of header to set; if None, unsets header
         """
@@ -84,7 +85,7 @@ class HTTPHandler(object):
                 body = handler_result
                 if self.use_etag:
                     etag_value = '"' + hashlib.sha1(body.encode('utf-8')).hexdigest() + '"'
-                    self.set_header('ETag', etag_value)
+                    self.__set_header('ETag', etag_value)
                     if request.headers.get('If-None-Match') == etag_value:
                         raise NotModified(self._headers)
             else:
