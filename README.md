@@ -53,3 +53,10 @@ Docs
 For documentation go to http://rainfall.readthedocs.org/
 
 More examples here https://github.com/mind1master/rainfall/blob/master/rainfall/tests/app.py
+
+
+Credits
+=======================================
+Author: Anton Kasyanov (https://github.com/mind1master/)
+
+Contributors: mksh (https://github.com/mksh)

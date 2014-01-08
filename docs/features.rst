@@ -113,3 +113,40 @@ To test the rainfall apps you can use :class:`rainfall.unittest.RainfallTestCase
             r = self.client.query('/')
             self.assertEqual(r.status, 200)
             self.assertEqual(r.body, 'Hello!')
+
+ETag
+-------------------------------------
+
+:class:`rainfall.web.HTTPHandler` allows to use ETag for cache validation.
+
+Example::
+
+    class EtagHandler(HTTPHandler):
+
+        use_etag = True
+        payload = "PowerOfYourHeart"
+
+        def handle(self, request):
+            return self.payload
+
+Then we test it this way::
+
+    def test_etag_wo_ifnonematch(self):
+        etag_awaiting = '"' + hashlib.sha1(EtagHandler.payload.encode('utf-8')).hexdigest() + '"'
+        r = self.client.query(
+            '/etag', method='GET'
+        )
+        self.assertEqual(r.status, 200)
+        self.assertEqual(etag_awaiting, r.headers.get('ETag'))
+
+    def test_etag_with_ifnonematch(self):
+        etag_awaiting = '"' + hashlib.sha1(EtagHandler.payload.encode('utf-8')).hexdigest() + '"'
+        r = self.client.query(
+            '/etag', method='GET',
+            headers={
+                "If-None-Match": etag_awaiting
+            }
+        )
+        self.assertEqual(r.status, 304)
+        self.assertEqual(r.body, '')
+        self.assertEqual(etag_awaiting, r.headers.get('ETag'))

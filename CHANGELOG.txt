@@ -1,0 +1,6 @@
+0.8.2
+
+Initial release
+
+0.8.3
+ETag support (pull request by mksh)

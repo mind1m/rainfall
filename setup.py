@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='rainfall',
-    version='0.8.2',
+    version='0.8.3',
     author='Anton Kasyanov',
     author_email='antony.kasyanov@gmail.com',
     packages=['rainfall'],
