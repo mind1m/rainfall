@@ -22,7 +22,7 @@ setup(
     WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
     License for the specific language governing permissions and limitations""",
     description='Micro web framework around asyncio (ex tulip)',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=[
         "asyncio",
         "jinja2"
