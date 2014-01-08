@@ -65,7 +65,7 @@ Example::
 
 GET and POST params
 -------------------------------------
-Using :func:`rainfall.http.HTTPRequest.GET` and :func:`rainfall.http.HTTPRequest.POST` you can easily handle forms data.
+Using :attr:`rainfall.http.HTTPRequest.GET` and :attr:`rainfall.http.HTTPRequest.POST` you can easily handle forms data.
 
 
 Logging
