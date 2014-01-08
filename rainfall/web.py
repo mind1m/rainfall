@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
-import asyncio
 import signal
-import datetime
+import asyncio
+import hashlib
 import traceback
 import logging
-
-from concurrent.futures import ThreadPoolExecutor
 
 from http import client
 from jinja2 import Environment, FileSystemLoader
 
-from .utils import TerminalColors, RainfallException
+from .utils import TerminalColors, RainfallException, NotModified
 from .http import HTTPResponse, HTTPRequest, HTTPError
 
 
@@ -22,6 +20,23 @@ class HTTPHandler(object):
 
     All handling happens in handle method.
     """
+
+    use_etag = True
+
+    def __init__(self):
+        self._headers = {}
+
+    def set_header(self, header_name, header_value):
+        """
+        Set (or unset) a particular header for response
+        :param header_name: Name of header to set
+        :param header_value: Value of header to set; if None, unsets header
+        """
+        if header_value is not None:
+            self._headers[header_name] = header_value
+        elif header_name in self._headers:
+            del self._headers[header_name]
+
     @asyncio.coroutine
     def handle(self, request, **kwargs):
         """
@@ -67,13 +82,18 @@ class HTTPHandler(object):
                 code = handler_result.code
             elif isinstance(handler_result, str):
                 body = handler_result
+                if self.use_etag:
+                    etag_value = '"' + hashlib.sha1(body.encode('utf-8')).hexdigest() + '"'
+                    self.set_header('ETag', etag_value)
+                    if request.headers.get('If-None-Match') == etag_value:
+                        raise NotModified(self._headers)
             else:
                 raise RainfallException(
                     "handle() result must be rainfall.web.HTTPServer or str, found {}".format(
                         type(handler_result)
                     )
                 )
-        return (code, body)
+        return code, self._headers, body
 
 
 class HTTPServer(asyncio.Protocol):
@@ -118,11 +138,15 @@ class HTTPServer(asyncio.Protocol):
             result = re.match(pattern, path)
             if result:
                 try:
-                    code, body = yield from handler(
+                    code, headers, body = yield from handler(
                         request, **result.groupdict()
                     )
+                    response.additional_headers = headers
                     response.code = code
                     response.body = body
+                except NotModified as e:
+                    response.code = 304
+                    response.additional_headers = e.args[0]
                 except Exception as e:
                     response.code = client.INTERNAL_SERVER_ERROR
                     exc = sys.exc_info()
@@ -135,6 +159,8 @@ class HTTPServer(asyncio.Protocol):
             response.body = "<h1>{} {}</h1>".format(
                 response.code, client.responses[response.code]
             )
+        elif response.code == 304:
+            response.body = ""
 
         self.transport.write(response.compose().encode())
         logging.info('{} {} {}'.format(

@@ -6,21 +6,25 @@ from rainfall.http import HTTPError
 
 
 class HelloHandler(HTTPHandler):
+
     def handle(self, request):
         return 'Hello!'
 
 
 class TemplateHandler(HTTPHandler):
+
     def handle(self, request):
         return self.render('base.html', text='Rendered')
 
 
 class HTTPErrorHandler(HTTPHandler):
+
     def handle(self, request):
         return HTTPError(403)
 
 
 class ExceptionHandler(HTTPHandler):
+
     def handle(self, request):
         raise Exception('Fail')
 
@@ -28,16 +32,19 @@ class ExceptionHandler(HTTPHandler):
 class SleepHandler(HTTPHandler):
     @asyncio.coroutine
     def handle(self, request):
+
         yield from asyncio.sleep(0.1)
         return 'Done'
 
 
 class ParamHandler(HTTPHandler):
+
     def handle(self, request, number):
         return number
 
 
 class GetFormHandler(HTTPHandler):
+
     def handle(self, request):
         data = {}
         if request.GET:
@@ -46,11 +53,21 @@ class GetFormHandler(HTTPHandler):
 
 
 class PostFormHandler(HTTPHandler):
+
     def handle(self, request):
         data = {}
         if request.POST:
             data = request.POST
         return self.render('form.html', method='POST', data=data)
+
+
+class EtagHandler(HTTPHandler):
+
+    use_etag = True
+    payload = "PowerOfYourHeart"
+
+    def handle(self, request):
+        return self.payload
 
 
 settings = {
@@ -71,6 +88,8 @@ app = Application(
 
         r'^/forms/get$': GetFormHandler(),
         r'^/forms/post$': PostFormHandler(),
+
+        r'^/etag$': EtagHandler()
     },
     settings=settings,
 )

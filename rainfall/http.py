@@ -92,16 +92,17 @@ class HTTPResponse(object):
     :param code: response code
     :param additional_headers:
     """
-    def __init__(self, body='', code=client.OK, additional_headers=None):
+
+    _default_headers = {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Server': 'rainfall/python',
+    }
+
+    def __init__(self, body='', code=client.OK):
         self.body = body
         self.code = code
-        self.headers = {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Server': 'rainfall/python',
-            'Date': formatdate(timeval=None, localtime=False, usegmt=True),
-        }
-        if additional_headers:
-            self.headers.update(additional_headers)
+        self._headers = {}
+        self.additional_headers = None
 
     def compose(self):
         """
@@ -112,7 +113,13 @@ class HTTPResponse(object):
         header = 'HTTP/1.1 {code} {name}\r\n'.format(
             code=self.code, name=client.responses[self.code]
         )
-        for head, value in self.headers.items():
+        self._headers.update(self._default_headers)
+        self._headers.update(
+            Date=formatdate(timeval=None, localtime=False, usegmt=True)
+        )
+        if self.additional_headers:
+            self._headers.update(self.additional_headers)
+        for head, value in self._headers.items():
             header += '{}: {}\r\n'.format(head, value)
         return '{}\r\n{}'.format(header, self.body)
 

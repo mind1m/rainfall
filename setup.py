@@ -26,6 +26,7 @@ setup(
         "asyncio",
         "jinja2"
     ],
+    test_suite="rainfall.tests",
     keywords = ['asyncio', 'tulip', 'web', 'tornado', 'cyclone', 'python3'],
     classifiers = [
         "Programming Language :: Python :: 3",

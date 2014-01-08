@@ -1,7 +1,8 @@
 import time
+import hashlib
 
 from rainfall.unittest import RainfallTestCase
-from app import app
+from app import app, EtagHandler
 
 
 class HTTPTestCase(RainfallTestCase):
@@ -57,3 +58,23 @@ class HTTPTestCase(RainfallTestCase):
         self.assertEqual(r.status, 200)
         self.assertTrue('Name: Anton' in r.body)
         self.assertTrue('Number: 42' in r.body)
+
+    def test_etag_wo_ifnonematch(self):
+        etag_awaiting = '"' + hashlib.sha1(EtagHandler.payload.encode('utf-8')).hexdigest() + '"'
+        r = self.client.query(
+            '/etag', method='GET'
+        )
+        self.assertEqual(r.status, 200)
+        self.assertEqual(etag_awaiting, r.headers.get('ETag'))
+
+    def test_etag_with_ifnonematch(self):
+        etag_awaiting = '"' + hashlib.sha1(EtagHandler.payload.encode('utf-8')).hexdigest() + '"'
+        r = self.client.query(
+            '/etag', method='GET',
+            headers={
+                "If-None-Match": etag_awaiting
+            }
+        )
+        self.assertEqual(r.status, 304)
+        self.assertEqual(r.body, '')
+        self.assertEqual(etag_awaiting, r.headers.get('ETag'))
