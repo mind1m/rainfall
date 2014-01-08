@@ -3,6 +3,7 @@ dist/
 build/
 _build/
 env/
+.env/
 .DS_Store
 *.pyc
 tests.log

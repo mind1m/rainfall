@@ -13,14 +13,14 @@ class TestClient(object):
     def __init__(self, host, port):
         self.conn = http.client.HTTPConnection(host, port)
 
-    def query(self, url, method='GET', params=None):
+    def query(self, url, method='GET', params=None, headers={}):
         """
         Run a query using url and method.
         Returns response object with status, reason, body
         """
         if params:
             params = urllib.parse.urlencode(params)
-        self.conn.request(method, url, params)
+        self.conn.request(method, url, params, headers=headers)
         r = self.conn.getresponse()
         r.body = r.read().decode("utf-8")  # converting to unicode
         return r
