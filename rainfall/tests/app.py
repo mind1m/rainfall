@@ -76,20 +76,20 @@ settings = {
 }
 app = Application(
     {
-        r'^/$': HelloHandler(),
-        r'^/template$': TemplateHandler(),
+        r'^/$': HelloHandler,
+        r'^/template$': TemplateHandler,
 
-        r'^/http_error$': HTTPErrorHandler(),
-        r'^/exc_error$': ExceptionHandler(),
+        r'^/http_error$': HTTPErrorHandler,
+        r'^/exc_error$': ExceptionHandler,
 
-        r'^/sleep$': SleepHandler(),
+        r'^/sleep$': SleepHandler,
 
-        r'^/param/(?P<number>\d+)$': ParamHandler(),
+        r'^/param/(?P<number>\d+)$': ParamHandler,
 
-        r'^/forms/get$': GetFormHandler(),
-        r'^/forms/post$': PostFormHandler(),
+        r'^/forms/get$': GetFormHandler,
+        r'^/forms/post$': PostFormHandler,
 
-        r'^/etag$': EtagHandler()
+        r'^/etag$': EtagHandler
     },
     settings=settings,
 )

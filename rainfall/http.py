@@ -1,8 +1,61 @@
+import io
+import email
+import asyncio
+
 from urllib import parse
 from email.utils import formatdate
 from http import client
+from websockets.http import read_line
 
 from .utils import RainfallException
+
+
+MAX_HEADERS = 256
+USER_AGENT = 'rainfall/python'
+
+@asyncio.coroutine
+def read_message(stream):
+    """
+    Read an HTTP message from `stream`.
+    Return `(start_line, headers, body)` where `start_line` is :class:`bytes`.
+    `headers` is a :class:`~email.message.Message` and body is :class:`str`.
+
+    Copy of websocket.http.read_message with body support.
+    """
+    start_line = yield from read_line(stream)
+    header_lines = io.BytesIO()
+    for num in range(MAX_HEADERS):
+        header_line = yield from read_line(stream)
+        header_lines.write(header_line)
+        if header_line == b'\r\n':
+            break
+    else:
+        raise ValueError("Too many headers")
+    header_lines.seek(0)
+    headers = email.parser.BytesHeaderParser().parse(header_lines)
+
+    # there's not EOF in case of POST, so using read() here
+    content_length = int(headers.get('Content-Length', 0))
+    body = yield from stream.read(content_length)
+    body = body.decode("utf-8")
+
+    return start_line, headers, body
+
+
+@asyncio.coroutine
+def read_request(stream):
+    """
+    Read an HTTP/1.1 request from `stream`.
+
+    Return `(method, uri, headers, body)` `uri` isn't URL-decoded.
+
+    Raise an exception if the request isn't well formatted.
+
+    Copy of websocket.http.read_request with body support.
+    """
+    request_line, headers, body = yield from read_message(stream)
+    method, uri, version = request_line[:-2].decode().split(None, 2)
+    return method, uri, headers, body
 
 
 class HTTPRequest(object):
@@ -11,55 +64,13 @@ class HTTPRequest(object):
 
     :param raw: raw text of full http request
     """
-    def __init__(self, raw):
-        self.raw = raw
-        self.__headers = {}
-        self.__body = ''
-        self.__method = ''
-        self.__path = ''
+    def __init__(self, method, path, headers=None, body=None):
+        self.headers = headers or {}
+        self.body = body or ''
+        self.method = method or ''
+        self.path = path or ''
         self.__GET = {}
         self.__POST = {}
-
-    @property
-    def body(self):
-        """
-        :rtype: str, http body
-        """
-        if not self.__body:
-            self.__body = self.raw.split('\r\n\r\n')[1]
-        return self.__body
-
-    @property
-    def method(self):
-        """
-        :rtype: str, http method
-        """
-        if not self.__method:
-            self.__method = self.raw.split('\r\n')[0].split(' ')[0]
-        return self.__method
-
-    @property
-    def path(self):
-        """
-        :rtype: str, http url
-        """
-        if not self.__path:
-            self.__path = self.raw.split('\r\n')[0].split(' ')[1]
-        return self.__path
-
-    @property
-    def headers(self):
-        """
-        :rtype: dict, http headers
-        """
-        if not self.__headers:
-            raw_headers = self.raw.split('\r\n\r\n')[0].split('\r\n')
-            # skipping first line with path and method
-            raw_headers = raw_headers[1:]
-            for raw_header in raw_headers:
-                parts = raw_header.split(':')
-                self.__headers[parts[0].strip()] = parts[1].strip()
-        return self.__headers
 
     @property
     def POST(self):
@@ -95,13 +106,13 @@ class HTTPResponse(object):
 
     _default_headers = {
         'Content-Type': 'text/html; charset=utf-8',
-        'Server': 'rainfall/python',
+        'Server': USER_AGENT,
     }
 
-    def __init__(self, body='', code=client.OK):
-        self.body = body
+    def __init__(self, code=client.OK, headers=None, body=None):
+        self.body = body or ''
         self.code = code
-        self._headers = {}
+        self.headers = headers or {}
         self.additional_headers = None
 
     def compose(self):
@@ -113,13 +124,13 @@ class HTTPResponse(object):
         header = 'HTTP/1.1 {code} {name}\r\n'.format(
             code=self.code, name=client.responses[self.code]
         )
-        self._headers.update(self._default_headers)
-        self._headers.update(
+        self.headers.update(self._default_headers)
+        self.headers.update(
             Date=formatdate(timeval=None, localtime=False, usegmt=True)
         )
         if self.additional_headers:
-            self._headers.update(self.additional_headers)
-        for head, value in self._headers.items():
+            self.headers.update(self.additional_headers)
+        for head, value in self.headers.items():
             header += '{}: {}\r\n'.format(head, value)
         return '{}\r\n{}'.format(header, self.body)
 
