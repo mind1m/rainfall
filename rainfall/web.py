@@ -17,123 +17,11 @@ from websockets.handshake import check_request, build_response
 
 from .utils import TerminalColors, RainfallException, NotModified, match_dict_regexp, maybe_yield
 from .http import HTTPResponse, HTTPRequest, HTTPError, read_request, USER_AGENT
+from .handlers import HTTPHandler, WSHandler
 
 
 logger = logging.getLogger(__name__)
 MAX_HEADERS = 256
-
-
-class HTTPHandler(object):
-
-    """
-    Used by RainfallProtocol to react for some url pattern.
-
-    All handling happens in handle method.
-    """
-
-    use_etag = True
-
-    def __init__(self):
-        self._headers = {}
-
-    def __set_header(self, header_name, header_value):
-        """
-        Set (or unset) a particular header for response
-
-        :param header_name: Name of header to set
-        :param header_value: Value of header to set; if None, unsets header
-        """
-        if header_value is not None:
-            self._headers[header_name] = header_value
-        elif header_name in self._headers:
-            del self._headers[header_name]
-
-    @asyncio.coroutine
-    def handle(self, request, **kwargs):
-        """
-        May be an asyncio.coroutine or a regular function
-
-        :param request: :class:`rainfall.http.HTTPRequest`
-        :param kwargs: arguments from url if any
-
-        :rtype: str (may be rendered with self.render()) or :class:`rainfall.http.HTTPError`
-        """
-        raise NotImplementedError
-
-    def render(self, template_name, **kwargs):
-        """
-        Uses jinja2 to render a template
-
-        :param template_name: what file to render
-        :param kwargs: arguments to pass to jinja's render
-
-        :rtype: rendered string
-        """
-        template = RainfallProtocol._jinja_env.get_template(template_name)
-        result = template.render(kwargs)
-        return result
-
-    @asyncio.coroutine
-    def __call__(self, request, **kwargs):
-        """
-        Is called by :class:`rainfall.web.RainfallProtocol`
-
-        :rtype: (code, body)
-        """
-        code = 200
-        body = ''
-
-        handler_result = yield from maybe_yield(self.handle, request, **kwargs)
-
-        if handler_result:
-            if isinstance(handler_result, HTTPError):
-                code = handler_result.code
-            elif isinstance(handler_result, str):
-                body = handler_result
-                if self.use_etag:
-                    etag_value = '"' + \
-                        hashlib.sha1(body.encode('utf-8')).hexdigest() + '"'
-                    self.__set_header('ETag', etag_value)
-                    if request.headers.get('If-None-Match') == etag_value:
-                        raise NotModified(self._headers)
-            else:
-                raise RainfallException(
-                    "handle() result must be rainfall.web.RainfallProtocol or str, found {}".format(
-                        type(handler_result)
-                    )
-                )
-        return code, self._headers, body
-
-
-class WSHandler:
-
-    def __init__(self, protocol):
-        self.protocol = protocol
-
-    def send_message(self, message):
-        self.protocol.send(message)
-
-    @asyncio.coroutine
-    def on_open(self):
-        pass
-
-    @asyncio.coroutine
-    def on_close(self):
-        pass
-
-    @asyncio.coroutine
-    def on_message(self, message):
-        pass
-
-    @asyncio.coroutine
-    def _check_messages(self):
-        while True:
-            msg = yield from self.protocol.recv()
-
-            if not msg:
-                # that's all folks
-                return
-            yield from maybe_yield(self.on_message, msg)
 
 
 class RainfallProtocol(WebSocketServerProtocol):
@@ -146,7 +34,7 @@ class RainfallProtocol(WebSocketServerProtocol):
 
     _http_handlers = {}
     _ws_handlers = {}
-    _settings = {}
+    settings = {}
 
     def __init__(self):
         self._type = 'WS' # swithes to HTTP if needed
@@ -251,18 +139,18 @@ class RainfallProtocol(WebSocketServerProtocol):
         http_handler_cls, match_result = match_dict_regexp(self._http_handlers, path)
         if http_handler_cls:
             try:
-                http_handler = http_handler_cls()
+                http_handler = http_handler_cls(self.settings)
                 code, headers, body = yield from http_handler(
                     request, **match_result.groupdict()
                 )
-                response= HTTPResponse(code, headers, body)
+                response = HTTPResponse(code, headers, body)
             except NotModified as e:
-                response= HTTPResponse(304, e.args[0])
+                response = HTTPResponse(304, e.args[0])
             except Exception as e:
-                response= HTTPResponse(client.INTERNAL_SERVER_ERROR)
+                response = HTTPResponse(client.INTERNAL_SERVER_ERROR)
                 exc = sys.exc_info()
         else:
-            response.code = HTTPResponse(client.NOT_FOUND)
+            response = HTTPResponse(client.NOT_FOUND)
 
         if response.code != 200:
             response.body = "<h1>{} {}</h1>".format(
@@ -283,7 +171,7 @@ class Application(object):
     """
     The core class that is used to create and start server
 
-    :param handlers: dict with url keys and HTTPHandler instance values
+    :param handlers: dict with url keys and HTTPHandler or WSHandler subclasses
     :param settings: dict of app settings, defaults are
         settings = {
             'host': '127.0.0.1',
@@ -295,7 +183,7 @@ class Application(object):
     Example::
 
         app = Application({
-            '/': HelloHandler(),
+            '/': HelloHandler,
         })
         app.run()
 
@@ -313,14 +201,17 @@ class Application(object):
         if not 'port' in self.settings:
             self.settings['port'] = '8888'
 
-        RainfallProtocol._jinja_env = Environment(
+        self.settings['jinja_env'] = Environment(
             loader=FileSystemLoader(self.settings.get('template_path', ''))
         )
 
+
+        # configure protocol
         RainfallProtocol._http_handlers = {
             url: h for url, h in handlers.items() if issubclass(h, HTTPHandler)}
         RainfallProtocol._ws_handlers = {
             url: h for url, h in handlers.items() if issubclass(h, WSHandler)}
+        RainfallProtocol.settings = self.settings.copy()
 
     def run(self, process_queue=None, greeting=True):
         """

@@ -31,7 +31,7 @@ def match_dict_regexp(d, r):
         result = re.match(pattern, r)
         if result:
             return elem, result
-    return None
+    return None, None
 
 
 def maybe_yield(f, *args, **kwargs):
