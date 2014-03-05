@@ -51,7 +51,7 @@ class RainfallProtocol(WebSocketServerProtocol):
         try:
             method, url, headers, body = yield from self.general_handshake()
         except Exception as exc:
-            logger.info("Exception in opening handshake: {}".format(exc))
+            logger.info("Exception in opening handshake: {}".format(traceback.format_exc()))
             self.transport.close()
             return
 
