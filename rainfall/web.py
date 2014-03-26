@@ -52,13 +52,15 @@ class RainfallProtocol(WebSocketServerProtocol):
             method, url, headers, body = yield from self.general_handshake()
         except Exception as exc:
             logger.info("Exception in opening handshake: {}".format(traceback.format_exc()))
-            self.transport.close()
+            self.writer.write_eof()
+            self.writer.close()
             return
 
         if self._type == 'HTTP':
             # falling to HTTP
             yield from self.process_http(method, url, headers, body)
-            self.transport.close()
+            self.writer.write_eof()
+            self.writer.close()
             return
 
         # continue with websockets
@@ -84,7 +86,8 @@ class RainfallProtocol(WebSocketServerProtocol):
             yield from self.close()
         except Exception as exc:
             logger.info("Exception in closing handshake: {}".format(exc))
-            self.transport.close()
+            self.writer.write_eof()
+            self.writer.close()
 
     @asyncio.coroutine
     def general_handshake(self):
@@ -98,7 +101,7 @@ class RainfallProtocol(WebSocketServerProtocol):
         """
         # Read handshake request.
         try:
-            method, url, headers, body = yield from read_request(self.stream)
+            method, url, headers, body = yield from read_request(self.reader)
         except Exception as exc:
             raise HTTPError(code=500) from exc
 
@@ -117,7 +120,7 @@ class RainfallProtocol(WebSocketServerProtocol):
         build_response(set_header, key)
         response.append('\r\n')
         response = '\r\n'.join(response).encode()
-        self.transport.write(response)
+        self.writer.write(response)
 
         self.state = 'OPEN'
         self.opening_handshake.set_result(True)
@@ -157,7 +160,7 @@ class RainfallProtocol(WebSocketServerProtocol):
                 response.code, client.responses[response.code]
             )
 
-        self.transport.write(response.compose().encode())
+        self.writer.write(response.compose().encode())
         logging.info('{} {} {}'.format(
             request.method, request.path, response.code)
         )

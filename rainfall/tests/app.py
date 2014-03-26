@@ -72,8 +72,9 @@ class EtagHandler(HTTPHandler):
 
 settings = {
     'template_path': os.path.join(os.path.dirname(__file__), "templates"),
-    # 'logfile_path': os.path.join(os.path.dirname(__file__), "tests.log"),
+    'host': '127.0.0.1',
 }
+
 app = Application(
     {
         r'^/$': HelloHandler,
