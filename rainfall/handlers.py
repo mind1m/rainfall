@@ -110,11 +110,12 @@ class WSHandler:
     def __init__(self, protocol):
         self.protocol = protocol
 
+    @asyncio.coroutine
     def send_message(self, message):
         """
         Send a :param message to websocket
         """
-        self.protocol.send(message)
+        yield from self.protocol.send(message)
 
     @asyncio.coroutine
     def on_open(self):
