@@ -1,13 +1,19 @@
-write ws tests?
-or autobahn
+1) write ws tests? or autobahn
 
-separate examples
-remove unused imports, pep8
+2) separate examples
+3) remove unused imports, pep8
 
-deal with that, when close ws tab:
+4) deal with that, when close ws tab:
 
 03/05/2014 04:37:57 PM Failing the WebSocket connection: 1011
 Disconnected
 03/05/2014 04:37:57 PM Exception in closing handshake: 0 bytes read on a total of 2 expected bytes
 03/05/2014 04:38:03 PM poll took 5.506 seconds
 03/05/2014 04:38:03 PM Exception in opening handshake:
+
+
+5) ValueError: Line without CRLF in meanwhile
+
+6) iterator for handler result
+
+
