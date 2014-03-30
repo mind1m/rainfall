@@ -3,7 +3,7 @@ Quickstart
 
 To start off, rainfall is a micro web framework around asyncio (ex tulip), similiar to the cyclone or tornado. Since it is asyncio based, rainfall is fully asyncronous.
 
-Websocket support is work in progress, should be released with Python 3.4.
+Websocket support is work in progress, should be released soon.
 
 Installation
 ------------------------------------
