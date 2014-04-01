@@ -55,7 +55,7 @@ class RainfallTestCase(unittest.TestCase):
                 os.path.dirname(__file__), 'tests.log'
             )
 
-        q = multiprocessing.SimpleQueue()
+        q = multiprocessing.Queue()
         self.server_process = multiprocessing.Process(
             target=self.app.run,
             kwargs={'process_queue': q, 'greeting': False}
@@ -63,8 +63,7 @@ class RainfallTestCase(unittest.TestCase):
         self.server_process.start()
 
         # waiting for server to start
-        while q.empty():
-            continue
+        q.get()
 
         self.client = TestClient(self.app.settings['host'], self.app.settings['port'])
 
