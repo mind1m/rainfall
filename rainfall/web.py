@@ -216,13 +216,16 @@ class Application(object):
             url: h for url, h in handlers.items() if issubclass(h, WSHandler)}
         RainfallProtocol.settings = self.settings.copy()
 
-    def run(self, process_queue=None, greeting=True):
+    def run(self, process_queue=None, greeting=True, loop=None, run_forever=True):
         """
         Starts server on host and port given in settings,
         adds Ctrl-C signal handler.
 
         :param process_queue: SimpleQueue, used by testing framework
         :param greeting: bool, wheather to print to strout or not
+        :param loop: asyncio event loop, default is asyncio.get_event_loop()
+        :param run_forever: bool=True, set to False if you do not want rainfall
+            to call loop.run_forever()
         """
         self.host = self.settings['host']
         self.port = self.settings['port']
@@ -240,7 +243,8 @@ class Application(object):
                 format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p'
             )
 
-        loop = asyncio.get_event_loop()
+        if not loop:
+            loop = asyncio.get_event_loop()
 
         if signal is not None:
             loop.add_signal_handler(signal.SIGINT, loop.stop)
@@ -254,7 +258,8 @@ class Application(object):
         if greeting:
             self._greet(self.host + ':' + self.port, logfile_path)
 
-        loop.run_forever()
+        if run_forever:
+            loop.run_forever()
 
     def _start_server(self, loop, host, port):
         f = loop.create_server(RainfallProtocol, host, port)
