@@ -1,3 +1,4 @@
 asyncio
 jinja2
 sphinx
+websockets==2.1

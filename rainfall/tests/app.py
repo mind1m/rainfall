@@ -1,7 +1,7 @@
 import os
 import asyncio
 
-from rainfall.web import Application, HTTPHandler
+from rainfall.web import Application, HTTPHandler, WSHandler
 from rainfall.http import HTTPError
 
 
@@ -70,6 +70,13 @@ class EtagHandler(HTTPHandler):
         return self.payload
 
 
+class EchoWSHandler(WSHandler):
+
+    @asyncio.coroutine
+    def on_message(self, message):
+        yield from self.send_message(message)
+
+
 settings = {
     'template_path': os.path.join(os.path.dirname(__file__), "templates"),
     'host': '127.0.0.1',
@@ -90,7 +97,9 @@ app = Application(
         r'^/forms/get$': GetFormHandler,
         r'^/forms/post$': PostFormHandler,
 
-        r'^/etag$': EtagHandler
+        r'^/etag$': EtagHandler,
+
+        r'^/ws$': EchoWSHandler,
     },
     settings=settings,
 )
