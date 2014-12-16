@@ -1,3 +1,9 @@
+Latest news
+====================================
+I have temporary (or forever) stopped developing `rainfall` and switched to `aiohttp`, which includes a nice high level web framework:
+http://aiohttp.readthedocs.org/en/latest/web.html
+
+
 Quickstart
 ====================================
 
